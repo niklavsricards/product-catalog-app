@@ -33,10 +33,6 @@ class ProductController
             header('Location: /login');
         }
 
-        /*if (isset($_GET['search'])) {
-            $categoryId = $_GET['category'];
-        }*/
-
         $categoryId = $_GET['category'] ?? '';
 
         $categories = $this->categoryCollection->getAll();
