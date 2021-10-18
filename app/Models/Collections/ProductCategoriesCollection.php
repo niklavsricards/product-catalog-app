@@ -4,7 +4,7 @@ namespace App\Models\Collections;
 
 use App\Models\ProductCategory;
 
-class ProductCategoryCollection
+class ProductCategoriesCollection
 {
     private array $categories = [];
 

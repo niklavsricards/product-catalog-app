@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Products;
 
-use App\Models\Collections\ProductCategoryCollection;
-use App\Models\Collections\ProductCollection;
+use App\Models\Collections\ProductCategoriesCollection;
+use App\Models\Collections\ProductsCollection;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use PDO;
@@ -24,9 +24,9 @@ class MySqlProductsRepository implements ProductsRepository
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getCategories(): ProductCategoryCollection
+    public function getCategories(): ProductCategoriesCollection
     {
-        $collection = new ProductCategoryCollection();
+        $collection = new ProductCategoriesCollection();
 
         $statement = $this->pdo->prepare('SELECT * FROM product_categories');
         $statement->execute();
@@ -59,9 +59,9 @@ class MySqlProductsRepository implements ProductsRepository
         $statement->execute();
     }
 
-    public function getAll(string $userId, string $categoryId): ProductCollection
+    public function getAll(string $userId, string $categoryId): ProductsCollection
     {
-        $collection = new ProductCollection();
+        $collection = new ProductsCollection();
 
         if (empty($categoryId)) {
             $statement = $this->pdo->prepare('SELECT * FROM products WHERE user_id = :user_id 

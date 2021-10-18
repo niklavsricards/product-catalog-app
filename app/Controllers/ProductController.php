@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\Collections\ProductCategoryCollection;
+use App\Models\Collections\ProductCategoriesCollection;
 use App\Models\Product;
 use App\Repositories\Products\MySqlProductsRepository;
 use App\Repositories\Products\ProductsRepository;
@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid;
 class ProductController
 {
     private ProductsRepository $productsRepository;
-    private ProductCategoryCollection $categoryCollection;
+    private ProductCategoriesCollection $categoryCollection;
     private array $categories;
 
     public function __construct()
