@@ -6,6 +6,8 @@ use App\Models\Collections\ProductCategoriesCollection;
 use App\Models\Product;
 use App\Repositories\Products\MySqlProductsRepository;
 use App\Repositories\Products\ProductsRepository;
+use App\Repositories\Tags\MySqlTagsRepository;
+use App\Repositories\Tags\TagsRepository;
 use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 
@@ -13,18 +15,27 @@ class ProductController
 {
     private ProductsRepository $productsRepository;
     private ProductCategoriesCollection $categoryCollection;
+    private TagsRepository $tagsRepository;
     private array $categories;
+    private array $validTagIds;
 
     public function __construct()
     {
         $config = require_once 'config.php';
         $this->productsRepository = new MySqlProductsRepository($config);
+        $this->tagsRepository = new MySqlTagsRepository($config);
 
         $this->categoryCollection = $this->productsRepository->getCategories();
 
         foreach ($this->categoryCollection->getAll() as $category) {
             $this->categories[$category->getName()] = $category->getId();
         }
+
+        foreach ($this->tagsRepository->getTags()->allTags() as $tag) {
+            $this->validTagIds[$tag->name()] = $tag->id();
+        }
+
+
     }
 
     public function index(): void
@@ -46,6 +57,8 @@ class ProductController
     {
         $errors = [];
         $categories = $this->categoryCollection->getAll();
+        $tags = $this->tagsRepository->getTags()->allTags();
+
         require_once 'app/Views/Products/create.template.php';
     }
 
@@ -53,6 +66,7 @@ class ProductController
     {
         $errors = [];
         $categories = $this->categoryCollection->getAll();
+        $tags = $this->tagsRepository->getTags()->allTags();
 
         $id = Uuid::uuid4();
         $title = trim($_POST['title']);
@@ -60,6 +74,16 @@ class ProductController
         $userId = $_SESSION['userId'];
         $amount = $_POST['amount'];
         $createdAt = Carbon::now()->toDateTimeString('minute');
+
+        $selectecTags = $_POST['tags'] ?? null;
+
+        if (!is_null($selectecTags)) {
+            foreach ($selectecTags as $selectecTag) {
+                if (!in_array($selectecTag, $this->validTagIds)) {
+                    array_push($errors, 'Invalid product tag provided');
+                }
+            }
+        }
 
         if (empty($title)) {
             array_push($errors, 'Product title is required');
@@ -84,6 +108,10 @@ class ProductController
             );
 
             $this->productsRepository->add($product);
+
+            if (!is_null($selectecTags)) {
+                $this->tagsRepository->add($selectecTags, $product->getId());
+            }
 
             header('Location: /');
         } else {
