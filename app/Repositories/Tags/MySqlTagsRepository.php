@@ -22,7 +22,7 @@ class MySqlTagsRepository implements TagsRepository
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getTags(): TagsCollection
+    public function getAllTags(): TagsCollection
     {
         $collection = new TagsCollection();
 
@@ -44,6 +44,20 @@ class MySqlTagsRepository implements TagsRepository
         return $collection;
     }
 
+    public function getTagById(string $tagId): Tag
+    {
+        $statement = $this->pdo->prepare('SELECT * FROM tags WHERE id = :tagId LIMIT 1');
+        $statement->bindValue('tagId', $tagId);
+        $statement->execute();
+
+        $result = $statement->fetch();
+
+        return new Tag(
+            $result['id'],
+            $result['name']
+        );
+    }
+
     public function add(array $tags, string $productId): void
     {
         foreach ($tags as $tag)
@@ -51,5 +65,34 @@ class MySqlTagsRepository implements TagsRepository
             $statement = $this->pdo->prepare('INSERT INTO products_tags (product_id, tag_id) VALUES (?, ?)');
             $statement->execute([$productId, $tag]);
         }
+    }
+
+    public function getTagsForProduct(string $productId): TagsCollection
+    {
+        $tags = [];
+        $collection = new TagsCollection();
+
+        $statement = $this->pdo->prepare('SELECT * FROM products_tags WHERE product_id = :productId');
+        $statement->bindValue('productId', $productId);
+        $statement->execute();
+
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($result as $item)
+        {
+            $tags[] = $this->getTagById($item['tag_id']);
+        }
+
+        foreach ($tags as $tag)
+        {
+            $collection->add(
+                new Tag(
+                    $tag->id(),
+                    $tag->name()
+                )
+            );
+        }
+
+        return $collection;
     }
 }

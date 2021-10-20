@@ -6,11 +6,13 @@ use App\Models\Collections\ProductCategoriesCollection;
 use App\Models\Collections\ProductsCollection;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Repositories\Tags\MySqlTagsRepository;
 use PDO;
 
 class MySqlProductsRepository implements ProductsRepository
 {
     public PDO $pdo;
+    private MySqlTagsRepository $tagsRepository;
 
     public function __construct($config)
     {
@@ -22,6 +24,8 @@ class MySqlProductsRepository implements ProductsRepository
             "{$config['password']}"
         );
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $this->tagsRepository = new MySqlTagsRepository($config);
     }
 
     public function getCategories(): ProductCategoriesCollection
@@ -80,6 +84,8 @@ class MySqlProductsRepository implements ProductsRepository
 
         foreach ($data as $product)
         {
+            $tags = $this->tagsRepository->getTagsForProduct($product['id']);
+
             $collection->add(new Product(
                 $product['id'],
                 $product['title'],
@@ -87,7 +93,8 @@ class MySqlProductsRepository implements ProductsRepository
                 $product['user_id'],
                 $product['amount'],
                 $product['created_at'],
-                $product['updated_at']
+                $product['updated_at'],
+                $tags
             ));
         }
 

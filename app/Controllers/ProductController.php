@@ -31,7 +31,7 @@ class ProductController
             $this->categories[$category->getName()] = $category->getId();
         }
 
-        foreach ($this->tagsRepository->getTags()->allTags() as $tag) {
+        foreach ($this->tagsRepository->getAllTags()->allTags() as $tag) {
             $this->validTagIds[$tag->name()] = $tag->id();
         }
     }
@@ -51,7 +51,7 @@ class ProductController
     {
         $errors = [];
         $categories = $this->categoryCollection->getAll();
-        $tags = $this->tagsRepository->getTags()->allTags();
+        $tags = $this->tagsRepository->getAllTags()->allTags();
 
         require_once 'app/Views/Products/create.template.php';
     }
@@ -60,7 +60,7 @@ class ProductController
     {
         $errors = [];
         $categories = $this->categoryCollection->getAll();
-        $tags = $this->tagsRepository->getTags()->allTags();
+        $tags = $this->tagsRepository->getAllTags()->allTags();
 
         $id = Uuid::uuid4();
         $title = trim($_POST['title']);
@@ -117,14 +117,11 @@ class ProductController
     {
         $id = $vars['id'] ?? null;
 
-
         if ($id == null) header('Location: /');
 
         $product = $this->productsRepository->getOne($id);
 
-
-        if ($product !== null)
-        {
+        if ($product !== null) {
             $errors = [];
             $categories = $this->categoryCollection->getAll();
             require_once 'app/Views/Products/update.template.php';
@@ -173,8 +170,7 @@ class ProductController
 
         $product = $this->productsRepository->getOne($id);
 
-        if ($product !== null)
-        {
+        if ($product !== null) {
             $this->productsRepository->delete($product);
         }
 

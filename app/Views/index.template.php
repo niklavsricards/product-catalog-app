@@ -22,7 +22,7 @@
         </div>
     </form>
 
-    <table class="table m-2">
+    <table class="table m-2 w-75">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">Title</th>
@@ -40,7 +40,11 @@
                 <tr>
                     <td><?php echo $product->getTitle() ?></td>
                     <td><?php echo array_search($product->getCategory(), $this->categories) ?></td>
-                    <td>tags go here</td>
+                    <td>
+                        <?php foreach ($product->getTags()->allTags() as $tag): ?>
+                            <?php echo $tag->name() ?>
+                        <?php endforeach; ?>
+                    </td>
                     <td><?php echo $product->getAmount() ?></td>
                     <td><?php echo $product->getCreatedAt() ?></td>
                     <td><?php echo $product->getUpdatedAt() ?></td>

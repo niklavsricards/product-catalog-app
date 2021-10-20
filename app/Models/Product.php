@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Collections\TagsCollection;
+
 class Product
 {
     private string $id;
@@ -11,9 +13,10 @@ class Product
     private int $amount;
     private string $createdAt;
     private ?string $updatedAt;
+    private ?TagsCollection $tags;
 
     public function __construct(string $id, string $title, int $categoryId, string $userId,
-                                int $amount, string $createdAt, string $updatedAt = null)
+                                int $amount, string $createdAt, string $updatedAt = null, TagsCollection $tags = null)
     {
         $this->id = $id;
         $this->title = $title;
@@ -22,6 +25,7 @@ class Product
         $this->amount = $amount;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
+        $this->tags = $tags;
     }
 
     public function getId(): string
@@ -57,5 +61,10 @@ class Product
     public function getUserId(): string
     {
         return $this->userId;
+    }
+
+    public function getTags(): TagsCollection
+    {
+        return $this->tags;
     }
 }
