@@ -27,6 +27,7 @@
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Category</th>
+                <th scope="col">Tags</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Added</th>
                 <th scope="col">Edited</th>
@@ -39,6 +40,7 @@
                 <tr>
                     <td><?php echo $product->getTitle() ?></td>
                     <td><?php echo array_search($product->getCategory(), $this->categories) ?></td>
+                    <td>tags go here</td>
                     <td><?php echo $product->getAmount() ?></td>
                     <td><?php echo $product->getCreatedAt() ?></td>
                     <td><?php echo $product->getUpdatedAt() ?></td>

@@ -1,5 +1,8 @@
 <?php
 
+use App\Middleware\AuthorizedMiddleware;
+use App\Middleware\UnauthorizedMiddleware;
+
 require 'vendor/autoload.php';
 
 session_start();
@@ -16,9 +19,12 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     $r->addRoute('GET', '/products/create', 'ProductController@createView');
     $r->addRoute('POST', '/products/create', 'ProductController@create');
+
     $r->addRoute('GET', '/products/{id}/edit', 'ProductController@updateView');
     $r->addRoute('POST', '/products/{id}/edit', 'ProductController@update');
+
     $r->addRoute('POST', '/products/{id}/delete', 'ProductController@delete');
+
     $r->addRoute('GET', '/search', 'ProductController@index');
 });
 
@@ -42,6 +48,39 @@ switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::FOUND:
         $handler = $routeInfo[1];
         $vars = $routeInfo[2];
+
+        $middlewares = [
+            'ProductController@index' => [
+                AuthorizedMiddleware::class
+            ],
+            'ProductController@createView' => [
+                AuthorizedMiddleware::class
+            ],
+            'ProductController@create' => [
+                AuthorizedMiddleware::class
+            ],
+            'ProductController@updateView' => [
+                AuthorizedMiddleware::class
+            ],
+            'ProductControoler@update' => [
+                AuthorizedMiddleware::class
+            ],
+            'ProductController@delete' => [
+                AuthorizedMiddleware::class
+            ],
+            'AuthController@register' => [
+                UnauthorizedMiddleware::class
+            ],
+            'AuthController@registerView' => [
+                UnauthorizedMiddleware::class
+            ]
+        ];
+
+        if (array_key_exists($handler, $middlewares)) {
+            foreach ($middlewares[$handler] as $middleware) {
+                (new $middleware)->handle();
+            }
+        }
 
         [$controller, $method] = explode('@', $handler);
         $controller = 'App\Controllers\\' . $controller;

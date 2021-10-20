@@ -34,16 +34,10 @@ class ProductController
         foreach ($this->tagsRepository->getTags()->allTags() as $tag) {
             $this->validTagIds[$tag->name()] = $tag->id();
         }
-
-
     }
 
     public function index(): void
     {
-        if (!isset($_SESSION['userId'])) {
-            header('Location: /login');
-        }
-
         $categoryId = $_GET['category'] ?? '';
 
         $categories = $this->categoryCollection->getAll();
