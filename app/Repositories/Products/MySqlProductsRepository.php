@@ -14,8 +14,10 @@ class MySqlProductsRepository implements ProductsRepository
     public PDO $pdo;
     private MySqlTagsRepository $tagsRepository;
 
-    public function __construct($config)
+    public function __construct()
     {
+        $config = require 'config.php';
+
         $this->pdo = new PDO(
             "mysql:host={$config['host']};
             port={$config['port']};
@@ -45,6 +47,22 @@ class MySqlProductsRepository implements ProductsRepository
         }
 
         return $collection;
+    }
+
+    public function getCategoryById(string $id): ?ProductCategory
+    {
+        $statement = $this->pdo->prepare('SELECT * FROM product_categories WHERE id = ? LIMIT 1');
+        $statement->execute([$id]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($result)) return null;
+
+        return new ProductCategory(
+            $result['id'],
+            $result['name']
+        );
+
     }
 
     public function add(Product $product): void
@@ -89,7 +107,7 @@ class MySqlProductsRepository implements ProductsRepository
             $collection->add(new Product(
                 $product['id'],
                 $product['title'],
-                $product['category_id'],
+                $this->getCategoryById($product['category_id']),
                 $product['user_id'],
                 $product['amount'],
                 $product['created_at'],
@@ -114,7 +132,7 @@ class MySqlProductsRepository implements ProductsRepository
         return new Product(
             $product['id'],
             $product['title'],
-            $product['category_id'],
+            $this->getCategoryById($product['category_id']),
             $product['user_id'],
             $product['amount'],
             $product['created_at'],

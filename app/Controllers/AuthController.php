@@ -3,18 +3,19 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\Redirect;
 use App\Repositories\Users\MySqlUsersRepository;
 use App\Repositories\Users\UsersRepository;
+use DI\Container;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
     private UsersRepository $usersRepository;
 
-    public function __construct()
+    public function __construct(Container $container)
     {
-        $config = require_once 'config.php';
-        $this->usersRepository = new MySqlUsersRepository($config);
+        $this->usersRepository = $container->get(MySqlUsersRepository::class);
     }
 
     public function loginView(): void
@@ -58,7 +59,7 @@ class AuthController
             $user = $this->usersRepository->login($email);
             if ($user && password_verify($password, $user->password())) {
                 $_SESSION['userId'] = $user->userId();
-                header('Location: /');
+                Redirect::redirect("/");
             } else {
                 array_push($errors, "E-mail and/or password is not correct");
                 require_once 'app/Views/Auth/login.template.php';

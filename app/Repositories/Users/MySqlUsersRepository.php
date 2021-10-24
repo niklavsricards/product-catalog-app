@@ -9,8 +9,10 @@ class MySqlUsersRepository implements UsersRepository
 {
     public PDO $pdo;
 
-    public function __construct($config)
+    public function __construct()
     {
+        $config = require 'config.php';
+
         $this->pdo = new PDO(
             "mysql:host={$config['host']};
             port={$config['port']};

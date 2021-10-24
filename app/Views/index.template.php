@@ -39,7 +39,7 @@
             <?php foreach ($products as $product): ?>
                 <tr>
                     <td><?php echo $product->getTitle() ?></td>
-                    <td><?php echo array_search($product->getCategory(), $this->categories) ?></td>
+                    <td><?php echo $product->getCategory()->getName() ?></td>
                     <td>
                         <?php foreach ($product->getTags()->allTags() as $tag): ?>
                             <?php echo $tag->name() ?>

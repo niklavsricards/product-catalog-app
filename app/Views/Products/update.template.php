@@ -20,7 +20,7 @@
             <select class="custom-select d-block" id="category" name="category">
                 <option>Choose...</option>
                 <?php foreach ($categories as $category): ?>
-                    <option <?php if ($product->getCategory() == $category->getId()): ?>
+                    <option <?php if ($product->getCategory()->getId() == $category->getId()): ?>
                         <?php echo "selected" ?>
                     <?php endif; ?>
                             value="<?php echo $category->getId() ?>">
@@ -34,7 +34,7 @@
             <input type="number" min="0" class="form-control" id="amount" name="amount"
                    placeholder="Enter amount" required value="<?php echo $product->getAmount() ?>">
         </div>
-        <button type="submit" class="btn btn-success m-2">Add</button>
+        <button type="submit" class="btn btn-success m-2">Update</button>
     </form>
 
 <?php require_once 'app/Views/Partials/footer.template.php' ?>

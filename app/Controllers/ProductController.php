@@ -2,46 +2,31 @@
 
 namespace App\Controllers;
 
-use App\Models\Collections\ProductCategoriesCollection;
 use App\Models\Product;
 use App\Repositories\Products\MySqlProductsRepository;
 use App\Repositories\Products\ProductsRepository;
 use App\Repositories\Tags\MySqlTagsRepository;
 use App\Repositories\Tags\TagsRepository;
 use Carbon\Carbon;
+use DI\Container;
 use Ramsey\Uuid\Uuid;
 
 class ProductController
 {
     private ProductsRepository $productsRepository;
-    private ProductCategoriesCollection $categoryCollection;
     private TagsRepository $tagsRepository;
-    private array $categories;
-    private array $validTagIds;
 
-    public function __construct()
+    public function __construct(Container $container)
     {
-        $config = require_once 'config.php';
-        $this->productsRepository = new MySqlProductsRepository($config);
-        $this->tagsRepository = new MySqlTagsRepository($config);
-
-        $this->categoryCollection = $this->productsRepository->getCategories();
-
-        foreach ($this->categoryCollection->getAll() as $category) {
-            $this->categories[$category->getName()] = $category->getId();
-        }
-
-        foreach ($this->tagsRepository->getAllTags()->allTags() as $tag) {
-            $this->validTagIds[$tag->name()] = $tag->id();
-        }
+        $this->productsRepository = $container->get(MySqlProductsRepository::class);
+        $this->tagsRepository = $container->get(MySqlTagsRepository::class);
     }
 
     public function index(): void
     {
+        $categories = $this->productsRepository->getCategories()->getAll();
+
         $categoryId = $_GET['category'] ?? '';
-
-        $categories = $this->categoryCollection->getAll();
-
         $products = $this->productsRepository->getAll($_SESSION['userId'], $categoryId)->getAll();
 
         require_once 'app/Views/index.template.php';
@@ -50,7 +35,7 @@ class ProductController
     public function createView(): void
     {
         $errors = [];
-        $categories = $this->categoryCollection->getAll();
+        $categories = $this->productsRepository->getCategories()->getAll();
         $tags = $this->tagsRepository->getAllTags()->allTags();
 
         require_once 'app/Views/Products/create.template.php';
@@ -59,7 +44,7 @@ class ProductController
     public function create(): void
     {
         $errors = [];
-        $categories = $this->categoryCollection->getAll();
+        $categories = $this->productsRepository->getCategories()->getAll();
         $tags = $this->tagsRepository->getAllTags()->allTags();
 
         $id = Uuid::uuid4();
@@ -73,7 +58,7 @@ class ProductController
 
         if (!is_null($selectecTags)) {
             foreach ($selectecTags as $selectecTag) {
-                if (!in_array($selectecTag, $this->validTagIds)) {
+                if ($this->tagsRepository->getTagById($selectecTag) == null) {
                     array_push($errors, 'Invalid product tag provided');
                 }
             }
@@ -87,7 +72,7 @@ class ProductController
             array_push($errors, 'Product amount is required');
         }
 
-        if (!in_array($categoryId, $this->categories)) {
+        if ($this->productsRepository->getCategoryById($categoryId) == null) {
             array_push($errors, 'Such product category doesn\'t exist');
         }
 
@@ -123,7 +108,7 @@ class ProductController
 
         if ($product !== null) {
             $errors = [];
-            $categories = $this->categoryCollection->getAll();
+            $categories = $this->productsRepository->getCategories()->getAll();
             require_once 'app/Views/Products/update.template.php';
         } else {
             header('Location: /');
@@ -133,7 +118,7 @@ class ProductController
     public function update(array $vars): void
     {
         $errors = [];
-        $categories = $this->categoryCollection->getAll();
+        $categories = $this->productsRepository->getCategories()->getAll();
 
         $id = $vars['id'];
         $title = trim($_POST['title']);
@@ -149,7 +134,7 @@ class ProductController
             array_push($errors, 'Product amount is required');
         }
 
-        if (!in_array($categoryId, $this->categories)) {
+        if ($this->productsRepository->getCategoryById($categoryId) == null) {
             array_push($errors, 'Such product category doesn\'t exist');
         }
 

@@ -4,7 +4,7 @@ namespace App\Middleware;
 
 use App\Auth;
 
-class UnauthorizedMiddleware implements Middleware
+class LoggedInMiddleware implements Middleware
 {
     public function handle(): void
     {

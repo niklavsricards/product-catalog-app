@@ -8,19 +8,19 @@ class Product
 {
     private string $id;
     private string $title;
-    private int $categoryId;
+    private ProductCategory $category;
     private string $userId;
     private int $amount;
     private string $createdAt;
     private ?string $updatedAt;
     private ?TagsCollection $tags;
 
-    public function __construct(string $id, string $title, int $categoryId, string $userId,
+    public function __construct(string $id, string $title, ProductCategory $category, string $userId,
                                 int $amount, string $createdAt, string $updatedAt = null, TagsCollection $tags = null)
     {
         $this->id = $id;
         $this->title = $title;
-        $this->categoryId = $categoryId;
+        $this->category = $category;
         $this->userId = $userId;
         $this->amount = $amount;
         $this->createdAt = $createdAt;
@@ -38,9 +38,9 @@ class Product
         return $this->title;
     }
 
-    public function getCategory(): int
+    public function getCategory(): ProductCategory
     {
-        return $this->categoryId;
+        return $this->category;
     }
 
     public function getAmount(): int

@@ -10,8 +10,10 @@ class MySqlTagsRepository implements TagsRepository
 {
     public PDO $pdo;
 
-    public function __construct($config)
+    public function __construct()
     {
+        $config = require 'config.php';
+
         $this->pdo = new PDO(
             "mysql:host={$config['host']};
             port={$config['port']};
@@ -44,13 +46,15 @@ class MySqlTagsRepository implements TagsRepository
         return $collection;
     }
 
-    public function getTagById(string $tagId): Tag
+    public function getTagById(string $tagId): ?Tag
     {
         $statement = $this->pdo->prepare('SELECT * FROM tags WHERE id = :tagId LIMIT 1');
         $statement->bindValue('tagId', $tagId);
         $statement->execute();
 
         $result = $statement->fetch();
+
+        if (empty($result)) return null;
 
         return new Tag(
             $result['id'],
