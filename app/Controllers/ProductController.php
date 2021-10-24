@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Product;
+use App\Redirect;
 use App\Repositories\Products\MySqlProductsRepository;
 use App\Repositories\Products\ProductsRepository;
 use App\Repositories\Tags\MySqlTagsRepository;
@@ -92,7 +93,7 @@ class ProductController
                 $this->tagsRepository->add($selectecTags, $product->getId());
             }
 
-            header('Location: /');
+            Redirect::redirect("/");
         } else {
             require_once 'app/Views/Products/create.template.php';
         }
@@ -111,7 +112,7 @@ class ProductController
             $categories = $this->productsRepository->getCategories()->getAll();
             require_once 'app/Views/Products/update.template.php';
         } else {
-            header('Location: /');
+            Redirect::redirect("/");
         }
     }
 
@@ -140,8 +141,7 @@ class ProductController
 
         if (empty($errors)) {
             $this->productsRepository->update($id, $title, $categoryId, $amount, $updatedAt);
-
-            header('Location: /');
+            Redirect::redirect("/");
         } else {
             require_once 'app/Views/Products/create.template.php';
         }
@@ -159,6 +159,6 @@ class ProductController
             $this->productsRepository->delete($product);
         }
 
-        header('Location: /');
+        Redirect::redirect("/");
     }
 }

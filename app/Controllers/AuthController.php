@@ -119,7 +119,7 @@ class AuthController
 
             $_SESSION['userId'] = $user->userId();
 
-            header('Location: /');
+            Redirect::redirect("/");
         } else {
             require_once 'app/Views/Auth/register.template.php';
         }
@@ -128,6 +128,6 @@ class AuthController
     public function logout(): void
     {
         unset($_SESSION['userId']);
-        header('Location: /login');
+        Redirect::redirect("/login");
     }
 }

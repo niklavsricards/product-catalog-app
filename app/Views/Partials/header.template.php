@@ -1,3 +1,4 @@
+<?php use App\Auth; ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -20,7 +21,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="/">Home</span></a>
             </li>
-            <?php if (!isset($_SESSION['userId'])): ?>
+            <?php if (!Auth::LoggedIn()): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Login</a>
                 </li>
@@ -29,7 +30,7 @@
                 </li>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['userId'])): ?>
+            <?php if (Auth::loggedIn()): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="/">All products</a>
                 </li>
