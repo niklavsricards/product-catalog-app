@@ -26,84 +26,45 @@ class ProductController
     public function index(): void
     {
         $categories = $this->productsRepository->getCategories()->getAll();
-
         $categoryId = $_GET['category'] ?? '';
         $products = $this->productsRepository->getAll($_SESSION['userId'], $categoryId)->getAll();
-
         require_once 'app/Views/index.template.php';
     }
 
     public function createView(): void
     {
-        $errors = [];
         $categories = $this->productsRepository->getCategories()->getAll();
         $tags = $this->tagsRepository->getAllTags()->allTags();
-
         require_once 'app/Views/Products/create.template.php';
     }
 
     public function create(): void
     {
-        $errors = [];
-        $categories = $this->productsRepository->getCategories()->getAll();
-        $tags = $this->tagsRepository->getAllTags()->allTags();
-
-        $id = Uuid::uuid4();
-        $title = trim($_POST['title']);
-        $categoryId = $_POST['category'];
-        $userId = $_SESSION['userId'];
-        $amount = $_POST['amount'];
-        $createdAt = Carbon::now()->toDateTimeString('minute');
-
         $selectecTags = $_POST['tags'] ?? null;
 
+        $product = new Product(
+            Uuid::uuid4(),
+            trim($_POST['title']),
+            $this->productsRepository->getCategoryById($_POST['category']),
+            $_SESSION['userId'],
+            $_POST['amount'],
+            Carbon::now()->toDateTimeString('minute')
+        );
+
+        $this->productsRepository->add($product);
+
         if (!is_null($selectecTags)) {
-            foreach ($selectecTags as $selectecTag) {
-                if ($this->tagsRepository->getTagById($selectecTag) == null) {
-                    array_push($errors, 'Invalid product tag provided');
-                }
-            }
+            $this->tagsRepository->add($selectecTags, $product->getId());
         }
 
-        if (empty($title)) {
-            array_push($errors, 'Product title is required');
-        }
-
-        if (empty($amount)) {
-            array_push($errors, 'Product amount is required');
-        }
-
-        if ($this->productsRepository->getCategoryById($categoryId) == null) {
-            array_push($errors, 'Such product category doesn\'t exist');
-        }
-
-        if (empty($errors)) {
-            $product = new Product(
-                $id,
-                $title,
-                $categoryId,
-                $userId,
-                $amount,
-                $createdAt
-            );
-
-            $this->productsRepository->add($product);
-
-            if (!is_null($selectecTags)) {
-                $this->tagsRepository->add($selectecTags, $product->getId());
-            }
-
-            Redirect::redirect("/");
-        } else {
-            require_once 'app/Views/Products/create.template.php';
-        }
+        Redirect::redirect("/");
     }
 
     public function updateView(array $vars): void
     {
         $id = $vars['id'] ?? null;
 
-        if ($id == null) header('Location: /');
+        if ($id == null) Redirect::redirect("/");
 
         $product = $this->productsRepository->getOne($id);
 
@@ -118,47 +79,25 @@ class ProductController
 
     public function update(array $vars): void
     {
-        $errors = [];
-        $categories = $this->productsRepository->getCategories()->getAll();
-
-        $id = $vars['id'];
-        $title = trim($_POST['title']);
-        $categoryId = $_POST['category'];
-        $amount = $_POST['amount'];
-        $updatedAt = Carbon::now()->toDateTimeString('minute');
-
-        if (empty($title)) {
-            array_push($errors, 'Product title is required');
-        }
-
-        if (empty($amount)) {
-            array_push($errors, 'Product amount is required');
-        }
-
-        if ($this->productsRepository->getCategoryById($categoryId) == null) {
-            array_push($errors, 'Such product category doesn\'t exist');
-        }
-
-        if (empty($errors)) {
-            $this->productsRepository->update($id, $title, $categoryId, $amount, $updatedAt);
-            Redirect::redirect("/");
-        } else {
-            require_once 'app/Views/Products/create.template.php';
-        }
+        $this->productsRepository->update(
+            $vars['id'],
+            trim($_POST['title']),
+            $this->productsRepository->getCategoryById($_POST['category']),
+            $_POST['amount'],
+            Carbon::now()->toDateTimeString('minute')
+        );
+        Redirect::redirect("/");
     }
 
     public function delete(array $vars): void
     {
         $id = $vars['id'] ?? null;
-
-        if ($id == null) header('Location: /');
-
+        if ($id == null) Redirect::redirect("/");
         $product = $this->productsRepository->getOne($id);
 
         if ($product !== null) {
             $this->productsRepository->delete($product);
         }
-
         Redirect::redirect("/");
     }
 }

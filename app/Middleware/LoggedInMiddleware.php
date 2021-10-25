@@ -2,13 +2,13 @@
 
 namespace App\Middleware;
 
-use App\Auth;
+use App\Session;
 
 class LoggedInMiddleware implements Middleware
 {
     public function handle(): void
     {
-        if (Auth::loggedIn()) {
+        if (Session::loggedIn()) {
             header('Location: /');
             exit;
         }

@@ -72,7 +72,7 @@ class MySqlProductsRepository implements ProductsRepository
                                                    :created_at, :updated_at)');
         $statement->bindValue(':id', $product->getId());
         $statement->bindValue(':title', $product->getTitle());
-        $statement->bindValue(':category_id', $product->getCategory());
+        $statement->bindValue(':category_id', $product->getCategory()->getId());
         $statement->bindValue(':user_id', $product->getUserId());
         $statement->bindValue(':amount', $product->getAmount());
         $statement->bindValue(':created_at', $product->getCreatedAt());
@@ -140,11 +140,11 @@ class MySqlProductsRepository implements ProductsRepository
         );
     }
 
-    public function update(string $id, string $title, string $categoryId, int $amount, string $updatedAt): void
+    public function update(string $id, string $title, ProductCategory $category, int $amount, string $updatedAt): void
     {
         $statement = $this->pdo->prepare('UPDATE products SET title = ?, category_id = ?, 
                     amount = ?, updated_at = ? WHERE id = ?');
-        $statement->execute([$title, $categoryId, $amount, $updatedAt, $id]);
+        $statement->execute([$title, $category->getId(), $amount, $updatedAt, $id]);
     }
 
     public function delete(Product $product): void

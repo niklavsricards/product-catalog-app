@@ -1,12 +1,16 @@
-<?php require_once 'app/Views/Partials/header.template.php' ?>
+<?php use App\Session;
+
+require_once 'app/Views/Partials/header.template.php' ?>
 
     <h3 class="m-2">Add a new product to the catalog</h3>
 
-    <?php foreach ($errors as $error): ?>
-        <div class="alert alert-danger m-4 w-25" role="alert">
-            <?php echo $error ?>
-        </div>
-    <?php endforeach; ?>
+    <?php if (Session::errors()): ?>
+        <?php foreach ($_SESSION['errors'] as $error): ?>
+            <div class="alert alert-danger m-4 w-25" role="alert">
+                <?php echo $error ?>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
     <form class="w-25 m-4" method="post" action="/products/create">
         <div class="form-group m-2">

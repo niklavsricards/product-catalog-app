@@ -14,6 +14,6 @@ interface ProductsRepository
     public function add(Product $product): void;
     public function getAll(string $userId, string $categoryId): ProductsCollection;
     public function getOne(string $id): ?Product;
-    public function update(string $id, string $title, string $categoryId, int $amount, string $updatedAt): void;
+    public function update(string $id, string $title, ProductCategory $category, int $amount, string $updatedAt): void;
     public function delete(Product $product): void;
 }

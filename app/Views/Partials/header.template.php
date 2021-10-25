@@ -1,4 +1,4 @@
-<?php use App\Auth; ?>
+<?php use App\Session; ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,7 +21,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="/">Home</span></a>
             </li>
-            <?php if (!Auth::LoggedIn()): ?>
+            <?php if (!Session::loggedIn()): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Login</a>
                 </li>
@@ -30,7 +30,7 @@
                 </li>
             <?php endif; ?>
 
-            <?php if (Auth::loggedIn()): ?>
+            <?php if (Session::loggedIn()): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="/">All products</a>
                 </li>
